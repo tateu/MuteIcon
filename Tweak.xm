@@ -1,4 +1,3 @@
-
 #import "SpringBoard/SBMediaController.h"
 #import "LibStatusBar/LSStatusBarItem.h"
 #import "Settings.h"
@@ -13,7 +12,7 @@
 #endif
 
 
-LSStatusBarItem* icon;
+LSStatusBarItem *icon;
 BOOL enabled, bell;
 Settings *settings;
 
@@ -21,55 +20,55 @@ void changeIcon()
 {
 	bool isMute = false;
 	if (%c(SBMediaController) && [%c(SBMediaController) instancesRespondToSelector:@selector(isRingerMuted)])
-    	{
+	{
 		isMute = [[%c(SBMediaController) sharedInstance] isRingerMuted];
-		if(!isMute)
+		if (!isMute)
 		{
-			//[icon release];
-			//icon = nil;
+			// [icon release];
+			// icon = nil;
 			if (kCFCoreFoundationVersionNumber >= kCFCoreFoundationVersionNumber_iOS_7_0) {
 				// do >= iOS 7 stuff
-				//icon = [[%c(LSStatusBarItem) alloc] initWithIdentifier:[NSString stringWithFormat:@"com.lablabla.muteicon"] alignment:StatusBarAlignmentRight];
-	        	//[icon setImageName:  bell ? BELL_ICON_7 : SPEAKER_ICON_7];
-			[UIApp removeStatusBarImageNamed: bell ? BELL_ICON_7 : SPEAKER_ICON_7];
-			
-			} else {
+				// icon = [[%c(LSStatusBarItem) alloc] initWithIdentifier:[NSString stringWithFormat:@"com.lablabla.muteicon"] alignment:StatusBarAlignmentRight];
+				// [icon setImageName:bell ? BELL_ICON_7 : SPEAKER_ICON_7];
+				[UIApp removeStatusBarImageNamed: bell ? BELL_ICON_7 : SPEAKER_ICON_7];
+			}
+			else
+			{
 				// do <= iOS 6 stuff
-			//	icon = [[%c(LSStatusBarItem) alloc] initWithIdentifier:[NSString stringWithFormat:@"com.lablabla.muteicon"] alignment:StatusBarAlignmentRight];
-	        	//[icon setImageName:  bell ? BELL_ICON : SPEAKER_ICON];
-			[UIApp removeStatusBarImageNamed: bell ? BELL_ICON : SPEAKER_ICON];
+				// icon = [[%c(LSStatusBarItem) alloc] initWithIdentifier:[NSString stringWithFormat:@"com.lablabla.muteicon"] alignment:StatusBarAlignmentRight];
+				// [icon setImageName:bell ? BELL_ICON : SPEAKER_ICON];
+				[UIApp removeStatusBarImageNamed: bell ? BELL_ICON : SPEAKER_ICON];
 			}
 		}
-		if(isMute)
+		if (isMute)
 		{
 			if (kCFCoreFoundationVersionNumber >= kCFCoreFoundationVersionNumber_iOS_7_0) {
 				// do >= iOS 7 stuff
-				//icon = [[%c(LSStatusBarItem) alloc] initWithIdentifier:[NSString stringWithFormat:@"com.lablabla.muteicon"] alignment:StatusBarAlignmentRight];
-	        	//[icon setImageName:  bell ? BELL_ICON_7 : SPEAKER_ICON_7];
-			[UIApp addStatusBarImageNamed: bell ? BELL_ICON_7 : SPEAKER_ICON_7];
-			} else {
-				// do <= iOS 6 stuff
-			//	icon = [[%c(LSStatusBarItem) alloc] initWithIdentifier:[NSString stringWithFormat:@"com.lablabla.muteicon"] alignment:StatusBarAlignmentRight];
-	        	//[icon setImageName:  bell ? BELL_ICON : SPEAKER_ICON];
-			[UIApp addStatusBarImageNamed: bell ? BELL_ICON : SPEAKER_ICON];
+				// icon = [[%c(LSStatusBarItem) alloc] initWithIdentifier:[NSString stringWithFormat:@"com.lablabla.muteicon"] alignment:StatusBarAlignmentRight];
+				// [icon setImageName:bell ? BELL_ICON_7 : SPEAKER_ICON_7];
+				[UIApp addStatusBarImageNamed: bell ? BELL_ICON_7 : SPEAKER_ICON_7];
 			}
-
-		     	
+			else
+			{
+				// do <= iOS 6 stuff
+				// icon = [[%c(LSStatusBarItem) alloc] initWithIdentifier:[NSString stringWithFormat:@"com.lablabla.muteicon"] alignment:StatusBarAlignmentRight];
+				// [icon setImageName:bell ? BELL_ICON : SPEAKER_ICON];
+				[UIApp addStatusBarImageNamed: bell ? BELL_ICON : SPEAKER_ICON];
+			}
 		}
 	}
-	
 }
 
 %hook SpringBoard
 -(id)init
 {
 	[settings reloadPreferences];
-	return %orig;	
+	return %orig;
 }
-	
+
 /*-(void)ringerChanged:(int)changed{
 	%orig;
-	if(enabled) 
+	if (enabled)
 	{
 		changeIcon();
 	}
@@ -83,37 +82,35 @@ void changeIcon()
 	enabled = [[settings.preferences valueForKey:@"muteEnabled"] boolValue];
 	bell = [[settings.preferences valueForKey:@"iconType"] boolValue];
 
-	if(enabled) 
+	if (enabled)
 	{
 		changeIcon();
 	}
 }
-
 %end
 
 %hook SBMediaController
-
 -(void)setRingerMuted:(BOOL)muted
 {
 	%orig;
-	if(enabled)
+	if (enabled)
 	{
 		changeIcon();
 	}
 }
 %end
+
 static void reloadPrefsNotification(CFNotificationCenterRef center,
 									void *observer,
 									CFStringRef name,
 									const void *object,
-									CFDictionaryRef userInfo) 
+									CFDictionaryRef userInfo)
 {
-
 	[settings reloadPreferences];
 	enabled = [[settings.preferences valueForKey:@"muteEnabled"] boolValue];
-	if(!enabled) 
+	if (!enabled)
 	{
-		if(icon)
+		if (icon)
 		{
 			[icon release];
 			icon = nil;
@@ -122,23 +119,18 @@ static void reloadPrefsNotification(CFNotificationCenterRef center,
 	else
 	{
 		bell = [[settings.preferences valueForKey:@"iconType"] boolValue];
-		if(icon)
+		if (icon)
 		{
 			[icon release];
 			icon = nil;
 		}
 		changeIcon();
 	}
-
 }
 
 %ctor
 {
- 
 	//Register for the preferences-did-change notification
 	CFNotificationCenterRef r = CFNotificationCenterGetDarwinNotifyCenter();
 	CFNotificationCenterAddObserver(r, NULL, &reloadPrefsNotification, CFSTR("com.lablabla.muteicon/reloadPrefs"), NULL, 0);
 }
-
-
-

@@ -1,6 +1,5 @@
 include theos/makefiles/common.mk
 
-
 ARCHS = armv7 arm64 armv7s
 
 BUNDLE_NAME = MuteIconPrefs
