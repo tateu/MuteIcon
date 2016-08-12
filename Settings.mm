@@ -1,7 +1,7 @@
 #import "Settings.h"
 #import <Preferences/Preferences.h>
 #import <UIKit/UIKit.h>
-#define PLIST_PATH @"/var/mobile/Library/Preferences/com.lablabla.muteicon.prefs.plist"
+#define PLIST_PATH @"/var/mobile/Library/Preferences/com.lablabla.muteicon.plist"
 
 @implementation Settings
 @synthesize preferences;

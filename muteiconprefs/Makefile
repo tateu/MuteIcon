@@ -1,6 +1,4 @@
-include theos/makefiles/common.mk
-
-ARCHS = armv7 arm64 armv7s
+include $(THEOS)/makefiles/common.mk
 
 BUNDLE_NAME = MuteIconPrefs
 MuteIconPrefs_FILES = MuteIconPrefs.mm
@@ -13,6 +11,3 @@ include $(THEOS_MAKE_PATH)/bundle.mk
 internal-stage::
 	$(ECHO_NOTHING)mkdir -p $(THEOS_STAGING_DIR)/Library/PreferenceLoader/Preferences$(ECHO_END)
 	$(ECHO_NOTHING)cp entry.plist $(THEOS_STAGING_DIR)/Library/PreferenceLoader/Preferences/MuteIconPrefs.plist$(ECHO_END)
-
-internal-after-install::
-	install.exec "killall -9 SpringBoard"
